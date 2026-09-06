@@ -36,10 +36,14 @@ $$\mathcal{N}(x \vert{} \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left
 
 
 
-> **定義 4.1（確率過程）**
-> 任意の $N$ 個の入力 $\mathbf{x}_1, \dots, \mathbf{x}_N \in \mathcal{X}$ に対し、$N$ 個の出力 $\mathbf{f}_N = (f(\mathbf{x}_1), \dots, f(\mathbf{x}_N))$ の同時確率 $p(\mathbf{f}_N)$ を与えられる関係 $f(\cdot)$ を**確率過程（stochastic process）**と呼ぶ。
+> **定義 4.1（確率過程）**   
+> 任意の $N$ 個の入力 $\mathbf{x}_1, \dots, \mathbf{x}_N \in \mathcal{X}$ に対し、$N$ 個の出力 $\mathbf{f}_N = (f(\mathbf{x}_1), \dots, f(\mathbf{x}_N))$ の同時確率 $p(\mathbf{f}_N)$ を与えられる関係 $f(\cdot)$ を **確率過程（stochastic process）** と呼ぶ。
 
-> **定義 4.2（ガウス過程）**
+- 「同時確率を与える」の具体例 <br> 
+入力として好きな地点を 2 つ（$x_1=1, \, x_2=3$）選ぶ。このとき、それぞれの地点での高さ $(f_1, f_2) = (f(1), f(3))$ の組について、「$f_1$ が 1.5 付近、かつ $f_2$ が 3.2 付近になる確率はどれくらい？」という2つの値がペアでどう現れるかを表す数式（確率密度関数 $p(f_1, f_2)$）が 1 つにバシッと定まる、これが「同時確率を与える」ということ。もしこれが $N=3$ 点なら $p(f_1, f_2, f_3)$ が定まり、$N=100$ 点なら 100 変数の同時確率 $p(f_1, \dots, f_{100})$ が定まる。
+
+
+> **定義 4.2（ガウス過程）**  
 > 確率過程 $f(\cdot)$ において、同時確率 $p(f_1, \dots, f_N)$ が $N$ 次元ガウス分布として得られる場合、$f(\cdot)$ を**ガウス過程**と呼ぶ。
 
 「無限次元ベクトル」や「ヒルベルト空間」を持ち出さずとも、「任意の自然数 $N$ に対して同時確率 $p(f_1, \dots, f_N)$ が定まる」と有限の枠組みで言い換えることで、ガウス過程を実用的に扱える。
@@ -50,14 +54,19 @@ $$\mathcal{N}(x \vert{} \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left
 
 複数の確率変数の組 $(X, Y) \in \mathcal{X} \times \mathcal{Y}$ の分布を**同時分布（joint distribution）** $p(X, Y)$ と呼ぶ。
 
-> **定義 4.3（周辺化と周辺分布）**
-> 同時分布 $p(X, Y)$ から不要な変数を積分（または総和）によって消去し、$p(X)$ を得る操作を**周辺化（marginalization）**、得られた分布を**周辺分布（marginal distribution）**と呼ぶ。
+> **定義 4.3（周辺化と周辺分布）**  
+> 同時分布 $p(X, Y)$ から不要な変数を積分（または総和）によって消去し、$p(X)$ を得る操作を**周辺化（marginalization）**、得られた分布を **周辺分布（marginal distribution）** と呼ぶ。
 > 
 > $$p(X) = \int p(X, Y) dY \quad \left( \text{離散値の場合: } p(X) = \sum_{Y \in \mathcal{Y}} p(X, Y) \right)$$
 > 
 > 
 
-> **定義 4.4（条件付き分布）**
+![alt text](img/img-1.png)
+> https://kesco.co.jp/%E7%A2%BA%E7%8E%87%E5%88%86%E5%B8%83/
+
+
+
+> **定義 4.4（条件付き分布）**.  
 > $X$ を既知・所与としたときの $Y$ の確率分布を**条件付き分布** $p(Y\vert{}X)$ と呼ぶ。
 > 
 > $$\int p(Y\vert{}X) dY = 1 \tag{4.1}$$
@@ -66,43 +75,69 @@ $$\mathcal{N}(x \vert{} \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left
 > 
 > ※ 条件側 $X$ に関する積分 $\int p(Y\vert{}X) dX$ には制約がない点に注意。
 
-> **定義 4.5（ベイズの定理）**
+> **定義 4.5（ベイズの定理）**.  
 > 乗法定理 $p(X, Y) = p(Y\vert{}X)p(X) = p(X\vert{}Y)p(Y)$ より導かれる：
 > 
 > $$p(Y\vert{}X) = \frac{p(X\vert{}Y)p(Y)}{p(X)}$$
 > 
 > 
 
+---
+練習のために以下で二例やってみる
+
 #### 連鎖的生成モデルの手順（例 3：サイコロ・ダーツモデル）
+- 確率的生成モデリング  
+観測される値の生成過程を確率分布で表す作業
 
 サイコロの出目 $d \in \{1,\dots,6\}$ に応じて狙う位置 $\boldsymbol{\mu}(d)$ を決め、投げたダーツの刺さった位置 $x$ を観測するモデルを考える。
+![alt text](img/img-2.png)
 
-1. 未知の値を確率変数で表す（$x, d$）。
+やりたいこと
+- $x$の確率分布を密度関数$p(x)$の形で書き下す
+- サイコロの出目 $d$ が分からなくても、ダーツの刺さった位置 $x$ だけを見て、それがどんな確率分布 $p(x)$ に従って現れるかを数式で導き出すこと
+
+そのために
+- 現実には「サイコロの目 $d$」という途中の隠れた要因（潜在変数）があるが、最終的に観測・評価したいのは「ダーツの刺さった位置 $x$」。この $x$ の分布を求めるために、サイコロの出目$d$ が決まったときの $x$ の確率（的ごとのブレ）
+を別々にモデル化して結合し、最後に「出目 $d$ を足し合わせて消去（周辺化）する」ことで、目的の分布 $p(x)$（混合ガウス分布）を手に入れる。
+
+やること
+
+1. 未知の値を確率変数で表す : $x$ と $d$
+
 2. 個々の生成過程を確率分布で表す：
-$$p(d) = 1/6, \quad p(x\vert{}d) = \mathcal{N}(x \vert{} \boldsymbol{\mu}(d), \sigma^2)$$
+    - サイコロの出目の確率
+    $$p(d=1) = 1/6,...,p(d=6) = 1/6 $$
+    $$p(d) = 1/6 $$
 
+    - ダーツが刺さる位置  
+    $\mu$ を中心として適当な分散$\sigma^2$を持つと仮定
+    $$\quad p(x\vert{}d) = p(x\vert{}\mu(d)) = \mathcal{N}(x \vert{} \boldsymbol{\mu}(d), \sigma^2)$$
 
+    記号 $\sim$ を用いるとシンプルに表現できる：
 
-記号 $\sim$ を用いるとシンプルに表現できる：
-
-$$\begin{cases} d \sim p(d) \\ x\vert{}d \sim \mathcal{N}(\boldsymbol{\mu}(d), \sigma^2) \end{cases} \tag{4.4}$$
+    $$\begin{cases} d \sim p(d) \\ x\vert{}d \sim \mathcal{N}(\boldsymbol{\mu}(d), \sigma^2) \end{cases} $$
 
 
 3. 同時分布を表す：$p(x, d) = p(x\vert{}d)p(d)$。
+    > $X, D$の同時分布$p(x,d)$は2のそれぞれの積になる
+
+
 4. 不要な変数を周辺化して必要な分布を求める：
 
 $$p(x) = \sum_{d=1}^6 p(d)p(x\vert{}d) = \sum_{d=1}^6 \frac{1}{6} \mathcal{N}(x \vert{} \boldsymbol{\mu}(d), \sigma^2)$$
 
 
 
-これは複数のガウス分布の重み付き平均であり、混合ガウス分布（mixture of Gaussian distribution）と呼ばれる。
+これは複数のガウス分布の重み付き平均であり、混合ガウス分布（mixture of Gaussian distribution）と呼ばれる。上図の下段の6つの山を持つ確率密度平均。
+
 
 #### ガウス過程回帰モデルへの適用（例 4）
 
+ガウス過程回帰モデル $y = f(x)+\epsilon$において入力点$X = (x_1, ..., X_N)^T$は所与の定数とする。
 入力点 $\mathbf{X}$ を固定したとき、ガウス過程回帰も2段階の連鎖的モデルとなる。
 
 
-$$\begin{cases} \mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}) \\ \mathbf{y}\vert{}\mathbf{f} \sim \mathcal{N}(\mathbf{f}, \sigma^2 \mathbf{I}_N) \end{cases} \tag{4.5}$$
+$$\begin{cases} \mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}) \\ \mathbf{y}\vert{}\mathbf{f} \sim \mathcal{N}(\mathbf{f}, \sigma^2 \mathbf{I}_N) \end{cases} $$
 
 
 観測値 $\mathbf{y}$ の予測分布は、潜在関数値 $\mathbf{f}$ を周辺化積分して導出される：
@@ -114,34 +149,47 @@ $$p(\mathbf{y}) = \int p(\mathbf{y}\vert{}\mathbf{f}) p(\mathbf{f}) d\mathbf{f}$
 
 ### 4.1.3 独立性と条件付き独立性
 
-> **定義 4.6（確率変数の独立性）**
-> 次式が成り立つとき、$X$ と $Y$ は**独立（independent）**である（$p(X) = p(X\vert{}Y)$ と等価）。
-> 
+> **定義 4.6（確率変数の独立性）**.  
+> 次式が成り立つとき、$X$ と $Y$ は **独立（independent）** である  
+（$p(X) = p(X\vert{}Y)$ と等価）
 > $$p(X, Y) = p(X)p(Y)$$
-> 
-> 
 
-> **定義 4.7（確率変数の条件付き独立性）**
-> 次式を満たすとき、$X$ と $Y$ は**条件 $Z$ のもとで条件付き独立（conditionally independent）**である。
-> 
+> **定義 4.7（確率変数の条件付き独立性）**.  
+> 次式を満たすとき、$X$ と $Y$ は **条件 $Z$ のもとで条件付き独立（conditionally independent）** である。
 > $$p(X, Y \vert{} Z) = p(X\vert{}Z)p(Y\vert{}Z)$$
-> 
-> 
 
 ※ 条件付き独立であっても、無条件で独立 $p(X, Y) = p(X)p(Y)$ とは限らない点に注意。
 
-* **多変量ガウス分布における独立性（例 6）**
-共分散行列が対角行列 $\sigma^2 \mathbf{I}$ のとき、確率密度関数の指数部が分離され、$p(y_1, y_2, y_3) = p(y_1)p(y_2)p(y_3)$ となり互いに独立となる。
-* **ガウス過程回帰における性質（例 7）**
-$\mathbf{f}$ が与えられた下では各観測ノイズは無相関なので、観測値は条件付き独立となる：
+#### 例5. 3つ以上の確率変数間の独立性や条件付き独立性  
+$$p(A, B, C \vert{} D, E) = p(A \vert{} D, E) p(B, C \vert{} D, E)$$
+が成り立つとき、条件 $(B, C)$ の組み合わせを $F$、条件 $(D, E)$ の組み合わせを $G$ と呼び直すことによって$$p(A, F \vert{} G) = p(A\vert{}G)p(F\vert{}G)$$が得られる。このとき条件 $(D, E)$ のもとで、$A$ と $(B, C)$ が条件付き独立であることがいえる。
 
-$$p(\mathbf{y}\vert{}\mathbf{f}) = \prod_{n=1}^N p(y_n \vert{} f_n)$$
+#### 例6. 多変量ガウス分布における独立性
+$y_1, y_2, y_3$ の同時確率 $p(y_1, y_2, y_3)$ が平均 $(\mu_1, \mu_2, \mu_3)$ と共分散行列 $\sigma^2 \mathbf{I}_3$ をもつ3次元ガウス分布であるとき、これらの3変数は互いに独立
+(照明は省略)
 
+#### 例7. ガウス過程回帰における性質 
 
+ガウス過程回帰の連鎖的生成過程の2段目は 
+$p(\mathbf{y}\vert{}\mathbf{f}) = \mathcal{N}(\mathbf{f}, \sigma^2 \mathbf{I}_N)$ 
+となっていた（例4）。
+これは $y_1, \dots, y_N$ の $N$ 個の確率変数が互いに「$\mathbf{f}$ を条件とした条件付き独立」であることを意味する。
+すなわち、
+$$p(\mathbf{y}\vert{}\mathbf{f}) = p(y_1\vert{}\mathbf{f}) \times \dots \times p(y_N\vert{}\mathbf{f})$$
+が成り立つ。
 
-しかし、$\mathbf{f}$ を周辺化消去した $p(\mathbf{y})$ ではカーネル関数による相関が残るため、一般に $y_n$ 同士は無条件には独立ではない（$p(\mathbf{y}) \neq \prod p(y_n)$）。
-* **独立同分布（例 8）**
-同一分布から独立に標本を得ることを i.i.d.（independent and identically distributed）サンプリングと呼び、$d_1, d_2, d_3 \stackrel{\text{i.i.d.}}{\sim} p(d)$ と表記する。現実には完全な i.i.d. は存在せず、理解を単純化するための仮定である。
+しかし、$\mathbf{f}$ を周辺化消去した $p(\mathbf{y})$ では一般に $y_n$ 同士は無条件には独立ではない
+$$p(\mathbf{y}) = \int p(\mathbf{y}\vert{}\mathbf{f}) p(\mathbf{f}) \, d\mathbf{f}$$
+に対して、一般に、$p(\mathbf{y}) \neq p(y_1) \times \dots \times p(y_N)$ 
+
+> [!WARNING]
+> あとでちゃんと考える
+
+#### 例8.独立同分布と条件付き独立性
+同一分布から独立に標本を得ることを i.i.d.（independent and identically distributed）サンプリングと呼ぶ。
+例えば、同じサイコロを三回振って、その出目を観測する過程を↓のように書く。
+$$d_1, d_2, d_3 \stackrel{\text{i.i.d.}}{\sim} p(d)$$
+現実には完全な i.i.d. は存在せず、理解を単純化するための仮定である。
 
 ---
 
@@ -156,22 +204,35 @@ $$p(\mathbf{y}\vert{}\mathbf{f}) = \prod_{n=1}^N p(y_n \vert{} f_n)$$
 * **実線（無向リンク）**：相関があり、同時確率で表される関係。
 * **プレート表示（外枠パネル）**：$n = 1, \dots, N$ 回の繰り返しサンプリングを簡潔に示す表現。
 
-#### 線形回帰モデルとの対比（例 9, 例 10）
-
-* **線形回帰**：
-
-$$\begin{cases}   w_m \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0, \lambda^2) \\   f_n \vert{} \mathbf{x}_n = \sum_{m=1}^M w_m \phi_m(\mathbf{x}_n) \\   y_n \vert{} f_n \sim \mathcal{N}(f_n, \sigma^2)   \end{cases} \tag{4.6}$$
+![alt text](img/img-3.png)
 
 
+#### 例 9（線形回帰のグラフィカルモデル）
+線形回帰の確率的生成モデルを、グラフィカルモデルで描いてみる
+
+連鎖的生成過程.  
+$$\begin{cases} w_m \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0, \lambda^2) \\ f_n \vert{} \mathbf{x}_n = f(\mathbf{x}_n; \mathbf{w}) = \sum_{m=1}^M w_m \phi_m(\mathbf{x}_n) \\ y_n \vert{} f_n \sim \mathcal{N}(f_n, \sigma^2) \end{cases} \tag{4.6}$$
+
+ここで $n = 1, \dots, N$ は観測のインデックス、$m = 1, \dots, M$ は基底のインデックス
 
 潜在関数値 $f_1, \dots, f_N$ は共通パラメータ $\mathbf{w}$ を介して結ばれており、$f_n$ 同士を直接結ぶリンクは存在しない。
-* **ガウス過程回帰**：
-
-$$\begin{aligned}   \mathbf{f}_N, f_* \vert{} \mathbf{X}, \mathbf{x}_* &\sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}) \tag{4.7} \\   y_n \vert{} f_n &\sim \mathcal{N}(f_n, \sigma^2) \tag{4.8}   \end{aligned}$$
+![alt text](img/img-4.png)
 
 
+#### 例 10. ガウス過程回帰
+
+3.3.3 節のノイズを含む確率的生成モデルは、以下のようにまとめて書くことができます。$$\begin{aligned}
+\mathbf{f}_N, f_* | \mathbf{X}, \mathbf{x}_* &\sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}) \\
+y_n | f_n &\sim \mathcal{N}(f_n, \sigma^2) \\
+y_* | f_* &\sim \mathcal{N}(f_*, \sigma^2)
+\end{aligned}$$
+
+ここで $\boldsymbol{\mu}$ と $\mathbf{K}$ は $N+1$ 個の入力点 $\mathbf{X}, \mathbf{x}_*$ に対応する平均と共分散行列。
 
 同時確率が共分散行列 $\mathbf{K}$ で結ばれているため、**グラフィカルモデル上では $f_1, \dots, f_N, f_*$ の全ペアが無向リンクで結合される**点に特徴がある。
+
+![alt text](img/img-5.png)
+
 
 ---
 
