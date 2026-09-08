@@ -154,7 +154,7 @@ $$\begin{cases} \mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}) \\ \ma
 観測値 $\mathbf{y}$ の予測分布は、潜在関数値 $\mathbf{f}$ を周辺化積分して導出される：
 
 
-$$p(\mathbf{y}) = \int p(\mathbf{y}\vert{}\mathbf{f}) p(\mathbf{f}) d\mathbf{f} = \mathcal{N}(\boldsymbol{\mu}, \sigma^2\mathbf{I}_N) \tag{3.58}$$
+$$p(\mathbf{y}) = \int p(\mathbf{y}\vert{}\mathbf{f}) p(\mathbf{f}) d\mathbf{f} = \mathcal{N}(\boldsymbol{\mu}, \sigma^2\mathbf{I}_N) $$
 
 >（元の関数のブレ ＋ 観測のブレ）を足し算
 >
@@ -274,7 +274,7 @@ y_* | f_* &\sim \mathcal{N}(f_*, \sigma^2)
   $$L(\theta) = p(Y|\theta)$$
 - **最尤推定量**:
   尤度関数 $L(\theta)$ を最大化するパラメータ $\theta$：
-  $$\hat{\theta}_{\mathrm{ML}} = \arg\max_{\theta} L(\theta) \tag{4.10}$$
+  $$\hat{\theta}_{\mathrm{ML}} = \arg\max_{\theta} L(\theta) $$
   （※ $\arg\max_{\theta} L(\theta)$ は最大値を与える引数・パラメータ値を表す）
 
 > **最尤推定の発想**：
@@ -282,36 +282,150 @@ y_* | f_* &\sim \mathcal{N}(f_*, \sigma^2)
 
 ---
 
+<div style="background-color: #f6f9f9; padding: 10px;">
+
+#### よりみち：最尤推定は何をしたいのか？
+
+最尤推定（Maximum Likelihood Estimation; MLE）の目的は、
+
+> 「観測されたデータを最も自然に説明できるパラメータを求める」
+
+ことである。
+
+言い換えると、
+
+> 「もしパラメータ θ がこの値だったら、今観測したデータはどれくらい起こりやすいか？」
+
+を考え、その確率が最大になる θ を選ぶ方法である。
+
+---
+
+##### サイコロの例
+
+サイコロを10回振った結果が次だったとする。
+
+```text
+6, 6, 5, 6, 4, 6, 6, 5, 6, 6
+```
+
+###### 仮説1：公平なサイコロ
+
+```math
+P(6)=\frac{1}{6}
+```
+
+###### 仮説2：6が出やすいサイコロ
+
+```math
+P(6)=0.7
+```
+
+観測データでは 6 が 7 回出ているため、
+
+```text
+公平なサイコロよりも
+6が出やすいサイコロの方が説明しやすそう
+```
+
+と感じられる。
+
+最尤推定では、この「説明しやすさ」を数式化する。
+
+---
+
+##### 尤度（Likelihood）
+
+観測データを Y、
+パラメータを θ とすると、
+
+```math
+L(\theta)=p(Y|\theta)
+```
+
+を尤度（Likelihood）という。
+
+これは
+
+> 「パラメータ θ のもとで、観測データ Y が生成される確率」
+
+を表している。
+
+---
+
+##### 最尤推定
+
+最尤推定量は、
+
+```math
+\hat{\theta}_{ML}
+=
+\arg\max_{\theta} p(Y|\theta)
+```
+
+で定義される。
+
+意味は
+
+> 「観測データ Y が最も起こりやすくなる θ を選ぶ」
+
+である。
+
+---
+
+##### まとめ
+
+最尤推定とは、
+
+① データ生成モデルを仮定する
+      p(Y|θ)
+
+② 実際のデータを観測する
+
+③ そのデータが最も起こりやすくなる
+   パラメータ θ を探す
+
+④ その θ を採用する
+
+という考え方である。
+
+一言で表すと、
+
+> 最尤推定とは「観測データを最も自然に説明できるパラメータを逆算する方法」である。
+
+</div>
+
+---
 #### 4.2.1.3 最尤推定の具体例
 
 ##### 例11: 共分散既知のガウス分布の平均の最尤推定
 観測された $N$ 個の $D$ 次元縦ベクトル $\mathbf{y}_n \in \mathbb{R}^D \ (n=1,\ldots,N)$ が、平均 $\boldsymbol{\mu}$、既知の共分散行列 $\boldsymbol{\Sigma}$ を持つガウス分布から独立に生成されたとする：
-$$\mathbf{y}_n \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma}) \tag{4.11}$$
+$$\mathbf{y}_n \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma}) $$
 
 尤度関数：
-$$L(\boldsymbol{\mu}) = \prod_{n=1}^N \frac{1}{\sqrt{(2\pi)^D |\boldsymbol{\Sigma}|}} \exp\left( -\frac{1}{2}(\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right) \tag{4.12}$$
+未知の平均ベクトル$\boldsymbol{\mu}$の関数として...
+$$L(\boldsymbol{\mu}) = \prod_{n=1}^N \frac{1}{\sqrt{(2\pi)^D |\boldsymbol{\Sigma}|}} \exp\left( -\frac{1}{2}(\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right) $$
 
 対数をとることで主要項がパラメータの2次式となり、計算が容易になる（**対数尤度**）：
-$$\log L(\boldsymbol{\mu}) = -\frac{N}{2}\log((2\pi)^D |\boldsymbol{\Sigma}|) - \sum_{n=1}^N \frac{1}{2}(\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \tag{4.13}$$
+$$\log L(\boldsymbol{\mu}) = -\frac{N}{2}\log((2\pi)^D |\boldsymbol{\Sigma}|) - \sum_{n=1}^N \frac{1}{2}(\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) $$
 
 $\log L(\boldsymbol{\mu})$ は $\boldsymbol{\mu}$ に関して上に凸な2次関数なので、$\boldsymbol{\mu}$ で微分してゼロとおく（停留点を求める）ことで最尤推定量が得られる：
-$$\hat{\boldsymbol{\mu}}_{\mathrm{ML}} = \frac{1}{N}\sum_{n=1}^N \mathbf{y}_n \tag{4.14}$$
+$$\hat{\boldsymbol{\mu}}_{\mathrm{ML}} = \frac{1}{N}\sum_{n=1}^N \mathbf{y}_n $$
 （観測データの標本平均と一致する）
 
 ---
 
 ##### 例12: サイコロを用いたダーツ投げモデルの最尤推定
 サイコロの出目 $d_n \in \{1,\ldots,6\}$ と、投げたダーツの水平座標 $X_n$ のデータが $N$ 回分あるとする：
-$$\begin{cases} d_n \overset{\mathrm{i.i.d.}}{\sim} p(d) \\ X_n | d_n \overset{\mathrm{i.i.d.}}{\sim} \mathcal{N}(\mu(d_n), \sigma^2) \end{cases} \tag{4.15}$$
+$$\begin{cases} d_n \overset{\mathrm{i.i.d.}}{\sim} p(d) \\ X_n | d_n \overset{\mathrm{i.i.d.}}{\sim} \mathcal{N}(\mu(d_n), \sigma^2) \end{cases} $$
 狙った位置座標 $\boldsymbol{\theta} = (\mu(1), \ldots, \mu(6))$ を未知パラメータとして推定する。公平なサイコロ（$p(d_n) = 1/6$）とし、各試行の確率密度は以下となる：
-$$p(X_n | d_n, \boldsymbol{\theta}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{1}{2\sigma^2}(X_n - \mu(d_n))^2 \right) \tag{4.17}$$
+$$p(X_n | d_n, \boldsymbol{\theta}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{1}{2\sigma^2}(X_n - \mu(d_n))^2 \right) $$
 
 尤度関数および対数尤度関数：
-$$L(\boldsymbol{\theta}) = \prod_{n=1}^N p(d_n) p(X_n | d_n, \boldsymbol{\theta}) \tag{4.18}$$
-$$\log L(\boldsymbol{\theta}) = \sum_{n=1}^N \left( \log(1/6) - \frac{1}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}(X_n - \mu(d_n))^2 \right) \tag{4.19}$$
+$$L(\boldsymbol{\theta}) = \prod_{n=1}^N p(d_n) p(X_n | d_n, \boldsymbol{\theta}) $$
+$$\log L(\boldsymbol{\theta}) = \sum_{n=1}^N \left( \log(1/6) - \frac{1}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}(X_n - \mu(d_n))^2 \right) $$
 
 $\mu(1)$ に関する項を抜き出すため、$d_n = 1$ となったインデックスの集合を $N_1$、要素数を $n_1$、$d_n = 1$ のときの観測平均を $\overline{X_1}$ とする：
-$$\log L(\boldsymbol{\theta}) = -\frac{1}{2\sigma^2} \sum_{n \in N_1} (X_n - \mu(1))^2 + \text{others} = -\frac{1}{2\sigma^2} \left( n_1 \overline{X_1^2} - 2n_1 \overline{X_1}\mu(1) + n_1 \mu(1)^2 \right) + \text{others} \tag{4.21}$$
+$$\log L(\boldsymbol{\theta}) = -\frac{1}{2\sigma^2} \sum_{n \in N_1} (X_n - \mu(1))^2 + \text{others} = -\frac{1}{2\sigma^2} \left( n_1 \overline{X_1^2} - 2n_1 \overline{X_1}\mu(1) + n_1 \mu(1)^2 \right) + \text{others} $$
 
 これは $\mu(1)$ に関する単純な2次式であるため、最大化条件から直ちに最尤推定量が求まる：
 $$\hat{\mu}(1) = \overline{X_1} = \frac{1}{n_1} \sum_{n \in N_1} X_n$$
@@ -340,7 +454,7 @@ $$\hat{\mu}(1) = \overline{X_1} = \frac{1}{n_1} \sum_{n \in N_1} X_n$$
    $\theta$ の取り得る値の範囲や主観的な確信度を確率分布 $p(\theta)$ として表現する。
 3. **ベイズの定理の適用**:
    事後確率分布 $p(\theta|Y)$ を導出する：
-   $$p(\theta | Y) = \frac{p(Y | \theta) p(\theta)}{p(Y)} \tag{4.23}$$
+   $$p(\theta | Y) = \frac{p(Y | \theta) p(\theta)}{p(Y)} $$
 
 分母の $p(Y)$ は次式で定義される：
 $$p(Y) = \int p(Y|\theta) p(\theta) d\theta$$
@@ -365,26 +479,26 @@ $$p(Y) = \int p(Y|\theta) p(\theta) d\theta$$
 
 #### モデル設定
 平均 $\boldsymbol{\mu}$、既知の共分散行列 $\boldsymbol{\Sigma}$ を持つガウス分布からの観測 $\mathbf{y}_n \in \mathbb{R}^D$ を考える。未知パラメータ $\boldsymbol{\mu}$ の事前分布もガウス分布に従うと仮定する：
-$$\mathbf{y}_n \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma}), \quad n=1,\ldots,N \tag{4.24}$$
-$$\boldsymbol{\mu} \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_{\mu 0}) \tag{4.25}$$
+$$\mathbf{y}_n \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma}), \quad n=1,\ldots,N $$
+$$\boldsymbol{\mu} \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_{\mu 0}) $$
 （$\boldsymbol{\mu}_0$ は事前分布の中心、$\boldsymbol{\Sigma}_{\mu 0}$ は事前分布の共分散行列）
 
 #### 事後分布の導出
 ベイズの定理を対数表現で表す：
-$$\log p(\boldsymbol{\mu} | Y) = \log p(Y | \boldsymbol{\mu}) + \log p(\boldsymbol{\mu}) - \log p(Y) \tag{4.26}$$
+$$\log p(\boldsymbol{\mu} | Y) = \log p(Y | \boldsymbol{\mu}) + \log p(\boldsymbol{\mu}) - \log p(Y) $$
 
 第3項は $\boldsymbol{\mu}$ に依存しない定数項（$\mathrm{const.}$）であるため整理すると：
 $$\begin{aligned}
 \log p(\boldsymbol{\mu} | Y) &= -\frac{1}{2} \sum_{n=1}^N (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) - \frac{N}{2}\log(2\pi)^D |\boldsymbol{\Sigma}| \\
-&\quad - \frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) - \frac{1}{2}\log(2\pi)^D |\boldsymbol{\Sigma}_{\mu 0}| + \mathrm{const.} \tag{4.27}
+&\quad - \frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) - \frac{1}{2}\log(2\pi)^D |\boldsymbol{\Sigma}_{\mu 0}| + \mathrm{const.} 
 \end{aligned}$$
 
 対数事後密度関数が $\boldsymbol{\mu}$ の2次形式であるため、事後分布も再びガウス分布 $\mathcal{N}(\bar{\boldsymbol{\mu}}, \boldsymbol{\Sigma}_\mu)$ となる：
-$$\log p(\boldsymbol{\mu} | Y) = -\frac{1}{2} (\boldsymbol{\mu} - \bar{\boldsymbol{\mu}})^T \boldsymbol{\Sigma}_\mu^{-1} (\boldsymbol{\mu} - \bar{\boldsymbol{\mu}}) - \frac{1}{2}\log(2\pi)^D |\boldsymbol{\Sigma}_\mu| \tag{4.28}$$
+$$\log p(\boldsymbol{\mu} | Y) = -\frac{1}{2} (\boldsymbol{\mu} - \bar{\boldsymbol{\mu}})^T \boldsymbol{\Sigma}_\mu^{-1} (\boldsymbol{\mu} - \bar{\boldsymbol{\mu}}) - \frac{1}{2}\log(2\pi)^D |\boldsymbol{\Sigma}_\mu| $$
 
 係数を比較して平方完成することにより、事後分布の共分散行列 $\boldsymbol{\Sigma}_\mu$ と平均ベクトル $\bar{\boldsymbol{\mu}}$ が求まる：
-$$\boldsymbol{\Sigma}_\mu = \left( N\boldsymbol{\Sigma}^{-1} + \boldsymbol{\Sigma}_{\mu 0}^{-1} \right)^{-1} \tag{4.29a}$$
-$$\bar{\boldsymbol{\mu}} = \left( N\boldsymbol{\Sigma}^{-1} + \boldsymbol{\Sigma}_{\mu 0}^{-1} \right)^{-1} \left( \boldsymbol{\Sigma}^{-1}\sum_{n=1}^N \mathbf{y}_n + \boldsymbol{\Sigma}_{\mu 0}^{-1}\boldsymbol{\mu}_0 \right) \tag{4.29b}$$
+$$\boldsymbol{\Sigma}_\mu = \left( N\boldsymbol{\Sigma}^{-1} + \boldsymbol{\Sigma}_{\mu 0}^{-1} \right)^{-1}$$
+$$\bar{\boldsymbol{\mu}} = \left( N\boldsymbol{\Sigma}^{-1} + \boldsymbol{\Sigma}_{\mu 0}^{-1} \right)^{-1} \left( \boldsymbol{\Sigma}^{-1}\sum_{n=1}^N \mathbf{y}_n + \boldsymbol{\Sigma}_{\mu 0}^{-1}\boldsymbol{\mu}_0 \right) $$
 
 ---
 
@@ -395,20 +509,20 @@ $$\mathbf{S}_n = \boldsymbol{\Sigma}_n^{-1}, \quad \mathbf{S}_{\mu 0} = \boldsym
 精度行列を用いて表すと、ベイズ更新の構造が直観的に把握しやすくなる：
 
 ##### 1. 精度の加法性
-$$\mathbf{S}_\mu = \sum_{n=1}^N \mathbf{S}_n + \mathbf{S}_{\mu 0} \tag{4.31}$$
+$$\mathbf{S}_\mu = \sum_{n=1}^N \mathbf{S}_n + \mathbf{S}_{\mu 0} $$
 - 事後精度は「各観測の精度」と「事前の精度」の単純和となる。
 - 観測が増えるほど精度情報が加算され、事後分散は小さくなる（確信度が高まる）。
 - 事前確率 $\boldsymbol{\mu} \sim \mathcal{N}(\boldsymbol{\mu}_0, \mathbf{S}_{\mu 0}^{-1})$ の影響は、「精度 $\mathbf{S}_{\mu 0}$ を持つ仮想的な観測 $\mathbf{y}_0 = \boldsymbol{\mu}_0$ を得たこと」と等価である。
 
 ##### 2. 事後平均は精度による重みつき平均
-$$\bar{\boldsymbol{\mu}} = \mathbf{S}_\mu^{-1} \left( \sum_{n=1}^N \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 0} \boldsymbol{\mu}_0 \right) \tag{4.32}$$
+$$\bar{\boldsymbol{\mu}} = \mathbf{S}_\mu^{-1} \left( \sum_{n=1}^N \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 0} \boldsymbol{\mu}_0 \right) $$
 - 各観測値および事前平均を、それぞれの持つ精度（確からしさ）で重み付けした平均値となる。
 
 ##### 3. 逐次更新（Sequential Update）としての解釈
 全 $N$ 個の観測を、最初の5個と残りの $N-5$ 個に分割して考える：
-$$\mathbf{S}_\mu = \sum_{n=6}^N \mathbf{S}_n + \left( \sum_{n=1}^5 \mathbf{S}_n + \mathbf{S}_{\mu 0} \right) = \sum_{n=6}^N \mathbf{S}_n + \mathbf{S}_{\mu 5} \tag{4.33}$$
+$$\mathbf{S}_\mu = \sum_{n=6}^N \mathbf{S}_n + \left( \sum_{n=1}^5 \mathbf{S}_n + \mathbf{S}_{\mu 0} \right) = \sum_{n=6}^N \mathbf{S}_n + \mathbf{S}_{\mu 5} $$
 $$\bar{\boldsymbol{\mu}} = \mathbf{S}_\mu^{-1} \left( \sum_{n=6}^N \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 5} \boldsymbol{\mu}_5 \right)$$
 ここで、
-$$\mathbf{S}_{\mu 5} = \sum_{n=1}^5 \mathbf{S}_n + \mathbf{S}_{\mu 0}, \quad \boldsymbol{\mu}_5 = \mathbf{S}_{\mu 5}^{-1} \left( \sum_{n=1}^5 \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 0}\boldsymbol{\mu}_0 \right) \tag{4.34}$$
+$$\mathbf{S}_{\mu 5} = \sum_{n=1}^5 \mathbf{S}_n + \mathbf{S}_{\mu 0}, \quad \boldsymbol{\mu}_5 = \mathbf{S}_{\mu 5}^{-1} \left( \sum_{n=1}^5 \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 0}\boldsymbol{\mu}_0 \right) $$
 - **意味**: 「最初の5個の観測で得られた事後分布 $\mathcal{N}(\boldsymbol{\mu}_5, \mathbf{S}_{\mu 5}^{-1})$」を新たな事前分布とし、残り $N-5$ 個の観測で更新することと数学的に完全に一致する。
 - ベイズ推定では、データを一括処理しても、逐次的に1つずつ取り込んで更新しても同一の結果が得られる。
