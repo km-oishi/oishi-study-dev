@@ -433,9 +433,12 @@ $$\hat{\mu}(1) = \overline{X_1} = \frac{1}{n_1} \sum_{n \in N_1} X_n$$
 
 ---
 
-## 4.2.2 確率的生成モデルとベイズ推定
+> 260915 ここから!!
+> 参考：https://stats.biopapyrus.jp/bayesian-statistics/bayesian-estimation.html
 
-### 4.2.2.1 ベイズ推定の基本思想
+### 4.2.2 確率的生成モデルとベイズ推定
+
+#### 4.2.2.1 ベイズ推定の基本思想
 - **パラメータも確率変数として扱う**:
   最尤推定では未知パラメータ $\theta$ を「固定された1つの値」とみなすが、ベイズ推定では「**未知パラメータ $\theta$ 自体も確率変数である**」と考える。
 - **推定の本質は分布の更新**:
@@ -445,7 +448,7 @@ $$\hat{\mu}(1) = \overline{X_1} = \frac{1}{n_1} \sum_{n \in N_1} X_n$$
 
 ---
 
-### 4.2.2.2 ベイズ推定の手順
+#### 4.2.2.2 ベイズ推定の手順
 ベイズ推定は以下の3ステップで進める：
 
 1. **尤度関数のモデリング**:
@@ -463,7 +466,7 @@ $$p(Y) = \int p(Y|\theta) p(\theta) d\theta$$
 
 ---
 
-### 4.2.2.3 最尤推定とベイズ推定の比較
+#### 4.2.2.3 最尤推定とベイズ推定の比較
 | 項目 | 最尤推定 (MLE) | ベイズ推定 |
 | :--- | :--- | :--- |
 | **パラメータ $\theta$ の扱い** | 未知の固定値（点推定） | 確率変数（分布として推定） |
@@ -475,15 +478,15 @@ $$p(Y) = \int p(Y|\theta) p(\theta) d\theta$$
 
 ---
 
-### 4.2.2.4 例13: 共分散既知のガウス分布中心のベイズ推定
+#### 例13: 共分散既知のガウス分布中心のベイズ推定
 
-#### モデル設定
+##### モデル設定
 平均 $\boldsymbol{\mu}$、既知の共分散行列 $\boldsymbol{\Sigma}$ を持つガウス分布からの観測 $\mathbf{y}_n \in \mathbb{R}^D$ を考える。未知パラメータ $\boldsymbol{\mu}$ の事前分布もガウス分布に従うと仮定する：
 $$\mathbf{y}_n \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma}), \quad n=1,\ldots,N $$
 $$\boldsymbol{\mu} \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_{\mu 0}) $$
 （$\boldsymbol{\mu}_0$ は事前分布の中心、$\boldsymbol{\Sigma}_{\mu 0}$ は事前分布の共分散行列）
 
-#### 事後分布の導出
+##### 事後分布の導出
 ベイズの定理を対数表現で表す：
 $$\log p(\boldsymbol{\mu} | Y) = \log p(Y | \boldsymbol{\mu}) + \log p(\boldsymbol{\mu}) - \log p(Y) $$
 
@@ -494,15 +497,78 @@ $$\begin{aligned}
 \end{aligned}$$
 
 対数事後密度関数が $\boldsymbol{\mu}$ の2次形式であるため、事後分布も再びガウス分布 $\mathcal{N}(\bar{\boldsymbol{\mu}}, \boldsymbol{\Sigma}_\mu)$ となる：
+
 $$\log p(\boldsymbol{\mu} | Y) = -\frac{1}{2} (\boldsymbol{\mu} - \bar{\boldsymbol{\mu}})^T \boldsymbol{\Sigma}_\mu^{-1} (\boldsymbol{\mu} - \bar{\boldsymbol{\mu}}) - \frac{1}{2}\log(2\pi)^D |\boldsymbol{\Sigma}_\mu| $$
 
 係数を比較して平方完成することにより、事後分布の共分散行列 $\boldsymbol{\Sigma}_\mu$ と平均ベクトル $\bar{\boldsymbol{\mu}}$ が求まる：
 $$\boldsymbol{\Sigma}_\mu = \left( N\boldsymbol{\Sigma}^{-1} + \boldsymbol{\Sigma}_{\mu 0}^{-1} \right)^{-1}$$
 $$\bar{\boldsymbol{\mu}} = \left( N\boldsymbol{\Sigma}^{-1} + \boldsymbol{\Sigma}_{\mu 0}^{-1} \right)^{-1} \left( \boldsymbol{\Sigma}^{-1}\sum_{n=1}^N \mathbf{y}_n + \boldsymbol{\Sigma}_{\mu 0}^{-1}\boldsymbol{\mu}_0 \right) $$
 
+
 ---
 
-### 4.2.2.5 精度行列（Precision Matrix）による直観的理解
+<div style="background-color: #f6f9f9; padding: 10px;">
+
+式変形を復習がてら一応追ってみた。
+
+**前提の確率密度関数の定義**
+
+データ $\mathbf{y}_n$ およびパラメータ $\boldsymbol{\mu}$ は $D$ 次元ベクトル
+
+1. **尤度関数 $p(Y \vert{} \boldsymbol{\mu})$**
+データ $Y = \{\mathbf{y}_1, \dots, \mathbf{y}_N\}$ が平均 $\boldsymbol{\mu}$、共分散行列 $\boldsymbol{\Sigma}$ の正規分布から独立同分布（i.i.d.）で得られたと仮定。
+各サンプルの確率密度関数は以下の通り：
+
+$$p(\mathbf{y}_n \vert{} \boldsymbol{\mu}) = \frac{1}{(2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}\vert{}^{1/2}} \exp\left( -\frac{1}{2} (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right)$$
+
+独立性より、全体の尤度は各サンプルの積になる：
+
+$$p(Y \vert{} \boldsymbol{\mu}) = \prod_{n=1}^N p(\mathbf{y}_n \vert{} \boldsymbol{\mu}) = \prod_{n=1}^N \left[ \frac{1}{(2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}\vert{}^{1/2}} \exp\left( -\frac{1}{2} (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right) \right]$$
+
+2. **事前分布 $p(\boldsymbol{\mu})$**
+平均 $\boldsymbol{\mu}_0$、共分散行列 $\boldsymbol{\Sigma}_{\mu 0}$ の正規分布とする：
+
+$$p(\boldsymbol{\mu}) = \frac{1}{(2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}_{\mu 0}\vert{}^{1/2}} \exp\left( -\frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) \right)$$
+
+---
+
+**ステップ 1：尤度 $p(Y \vert{} \boldsymbol{\mu})$ の対数を取る**
+
+
+$$\begin{aligned} \log p(Y \vert{} \boldsymbol{\mu}) &= \sum_{n=1}^N \log \left[ \frac{1}{(2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}\vert{}^{1/2}} \exp\left( -\frac{1}{2} (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right) \right] \\ &= \sum_{n=1}^N \left( \log(1) - \log\left( (2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}\vert{}^{1/2} \right) + \log\left( \exp\left( -\frac{1}{2} (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right) \right) \right) \\ &= \sum_{n=1}^N \left( -\frac{1}{2} \log\left( (2\pi)^D \vert{}\boldsymbol{\Sigma}\vert{} \right) - \frac{1}{2} (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) \right) \end{aligned}$$
+
+第1項は $n$ に依存しないため、$N$ 回足し合わされて $N$ 倍になります：
+
+$$\log p(Y \vert{} \boldsymbol{\mu}) = -\frac{1}{2} \sum_{n=1}^N (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) - \frac{N}{2} \log\left( (2\pi)^D \vert{}\boldsymbol{\Sigma}\vert{} \right)$$
+
+---
+
+**ステップ 2：事前分布 $p(\boldsymbol{\mu})$ の対数を取る**
+
+$$\begin{aligned} \log p(\boldsymbol{\mu}) &= \log \left[ \frac{1}{(2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}_{\mu 0}\vert{}^{1/2}} \exp\left( -\frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) \right) \right] \\ &= -\log\left( (2\pi)^{D/2} \vert{}\boldsymbol{\Sigma}_{\mu 0}\vert{}^{1/2} \right) - \frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) \\ &= -\frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) - \frac{1}{2} \log\left( (2\pi)^D \vert{}\boldsymbol{\Sigma}_{\mu 0}\vert{} \right) \end{aligned}$$
+
+---
+
+**ステップ 3：ベイズの定理へ代入する**
+
+$$\log p(\boldsymbol{\mu} \vert{} Y) = \log p(Y \vert{} \boldsymbol{\mu}) + \log p(\boldsymbol{\mu}) - \log p(Y)$$
+
+分母の $-\log p(Y)$ はパラメータ $\boldsymbol{\mu}$ を含まないため、$\boldsymbol{\mu}$ に関しては定数：
+
+$$-\log p(Y) = \mathrm{const.}$$
+
+これにステップ1とステップ2の結果をそのまま代入：
+
+$$\begin{aligned} \log p(\boldsymbol{\mu} \vert{} Y) &= \underbrace{\left[ -\frac{1}{2} \sum_{n=1}^N (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) - \frac{N}{2}\log(2\pi)^D \vert{}\boldsymbol{\Sigma}\vert{} \right]}_{\log p(Y \vert{} \boldsymbol{\mu})} \\ &\quad + \underbrace{\left[ -\frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) - \frac{1}{2}\log(2\pi)^D \vert{}\boldsymbol{\Sigma}_{\mu 0}\vert{} \right]}_{\log p(\boldsymbol{\mu})} \\ &\quad + \underbrace{\vphantom{\frac{1}{2}} \mathrm{const.}}_{-\log p(Y)} \end{aligned}$$
+
+括弧を外して整理：
+
+$$\begin{aligned} \log p(\boldsymbol{\mu} \vert{} Y) &= -\frac{1}{2} \sum_{n=1}^N (\mathbf{y}_n - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{y}_n - \boldsymbol{\mu}) - \frac{N}{2}\log(2\pi)^D \vert{}\boldsymbol{\Sigma}\vert{} \\ &\quad - \frac{1}{2} (\boldsymbol{\mu} - \boldsymbol{\mu}_0)^T \boldsymbol{\Sigma}_{\mu 0}^{-1} (\boldsymbol{\mu} - \boldsymbol{\mu}_0) - \frac{1}{2}\log(2\pi)^D \vert{}\boldsymbol{\Sigma}_{\mu 0}\vert{} + \mathrm{const.} \end{aligned}$$
+
+</div>
+---
+
+#### 4.2.2.4 精度行列（Precision Matrix）による直観的理解
 分散の逆数を**精度**、共分散行列の逆行列を**精度行列**と呼ぶ：
 $$\mathbf{S}_n = \boldsymbol{\Sigma}_n^{-1}, \quad \mathbf{S}_{\mu 0} = \boldsymbol{\Sigma}_{\mu 0}^{-1}, \quad \mathbf{S}_\mu = \boldsymbol{\Sigma}_\mu^{-1}$$
 
@@ -520,9 +586,173 @@ $$\bar{\boldsymbol{\mu}} = \mathbf{S}_\mu^{-1} \left( \sum_{n=1}^N \mathbf{S}_n 
 
 ##### 3. 逐次更新（Sequential Update）としての解釈
 全 $N$ 個の観測を、最初の5個と残りの $N-5$ 個に分割して考える：
+
 $$\mathbf{S}_\mu = \sum_{n=6}^N \mathbf{S}_n + \left( \sum_{n=1}^5 \mathbf{S}_n + \mathbf{S}_{\mu 0} \right) = \sum_{n=6}^N \mathbf{S}_n + \mathbf{S}_{\mu 5} $$
-$$\bar{\boldsymbol{\mu}} = \mathbf{S}_\mu^{-1} \left( \sum_{n=6}^N \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 5} \boldsymbol{\mu}_5 \right)$$
+
+$$\bar{\boldsymbol{\mu}} = \mathbf{S}_\mu^{-1} \left( \sum_{n=6}^N \mathbf{S}_n \mathbf{y}_n + \sum_{n=1}^5 \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 0} \boldsymbol{\mu}_0 \right) = \mathbf{S}_\mu^{-1} \left( \sum_{n=6}^N \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 5} \boldsymbol{\mu}_5 \right)$$
+
 ここで、
 $$\mathbf{S}_{\mu 5} = \sum_{n=1}^5 \mathbf{S}_n + \mathbf{S}_{\mu 0}, \quad \boldsymbol{\mu}_5 = \mathbf{S}_{\mu 5}^{-1} \left( \sum_{n=1}^5 \mathbf{S}_n \mathbf{y}_n + \mathbf{S}_{\mu 0}\boldsymbol{\mu}_0 \right) $$
-- **意味**: 「最初の5個の観測で得られた事後分布 $\mathcal{N}(\boldsymbol{\mu}_5, \mathbf{S}_{\mu 5}^{-1})$」を新たな事前分布とし、残り $N-5$ 個の観測で更新することと数学的に完全に一致する。
+- **意味**: 「最初の5個の観測で得られた事後分布 $\mathcal{N}(\boldsymbol{\mu}_5, \mathbf{S}_{\mu 5}^{-1})$」を新たな事前分布とし、残り $N-5$ 個の観測で更新することと捉えられる。
 - ベイズ推定では、データを一括処理しても、逐次的に1つずつ取り込んで更新しても同一の結果が得られる。
+
+
+
+---
+
+## 4.3 確率分布の表現
+
+ベイズ推定の主目的は未知の値の事後確率分布を求めることにある。しかし、計算機上で確率分布を数値として表現・計算するには具体的な工夫が必要となる。
+
+
+---
+
+### 4.3.1 ノンパラメトリックモデルとは
+
+確率変数の確率分布を数値表現する方法は、大きく**パラメトリック**と**ノンパラメトリック**の2種に大別される。
+
+#### パラメトリック手法
+
+* **定義**: 推定対象の分布が「一定次元のパラメータ」で規定されると仮定し、そのパラメータを求めることで分布を決定する手法。
+* **代表例**: ガウス分布、ベータ分布など。
+* 事前確率・尤度・事後確率をパラメトリック分布で表すアプローチを**パラメトリック確率的モデリング**と呼ぶ。
+
+#### ノンパラメトリック手法
+
+* **定義**: 既知の特定のパラメトリック分布を仮定せず、データから直接柔軟に分布を捉える手法。
+* **代表例**: ヒストグラム法、カーネル密度推定法、K近傍法など。
+* **ガウス過程の位置づけ**:
+* 推定対象である未知関数 $f(x)$ に対して特定のパラメトリックな密度関数を仮定しないため、ノンパラメトリック手法の一種に分類される。
+* ※ただし、任意の $N$ 点における出力 $(f(x_1), \dots, f(x_N))$ の同時分布はガウス分布に従うと仮定するため、パラメトリックな側面も併せ持つ。パラメトリック／ノンパラメトリックの区別は便宜的・歴史的な分類にすぎない。
+
+
+
+---
+
+### 4.3.2 確率分布を標本で表現する
+
+#### 確率分布の可視化と標本表現
+
+* $x$ がスカラーの場合、密度関数 $p(x)$ や分布関数 $F(x) = \int_{-\infty}^x p(t)dt$ を描くのが直接的である。
+* 一方、分布から生成した標本 $x_1, \dots, x_N$ を散布図や度数分布として可視化する間接的表現も極めて有効である。
+* 密度関数 $p(x)$ が解析的な形（閉形式）で書けない、あるいは極めて複雑な場合でも、**標本を生成できるならば確率分布の性質を十分に把握・近似できる**。
+
+![alt text](img/img-6.png)
+
+解析的な形で書けなくても、有限個の標本から確率分布を可視化することができれば、確率密度関数の形がなんとなく理解できる。
+
+
+##### 例14：解析的に表せない分布の可視化
+
+一様分布と正規分布を連鎖させたモデル：
+
+$$\begin{cases} d \sim \text{Unif}(-1, 1) \\ x \sim \mathcal{N}(d, \sigma^2) \end{cases}$$
+
+
+> $d$: 範囲$(-1, 1)$から問う確率で生成される
+> $x$: $d$を中心とした正規分布
+
+
+この周辺分布 $p(x)$ は単純な初等関数で解析的に表せないが、上記の手順に沿って標本 $x_1, \dots, x_N$（例: 1000点）を生成することで、ヒストグラムや散布図として容易に可視化・把握できる。
+
+![alt text](img/img-7.png)
+
+---
+
+##### 標本による統計量の近似（モンテカルロ積分）
+
+標本列 $x_1, \dots, x_N$ を用いると、期待値 $\mathbb{E}[f(x)] = \int f(x)p(x)dx$ や分散 $\mathbb{V}[f(x)]$ を単純平均で近似できる。
+
+$$\mathbb{E}[f(x)] \approx \frac{1}{N} \sum_{n=1}^N f(x_n)$$
+
+$$\mathbb{V}[f(x)] \approx \frac{1}{N} \sum_{n=1}^N (f(x_n) - \mathbb{E}[f(x)])^2$$
+
+>コメント：それはそう
+
+---
+
+##### 重みつき標本（Weighted Samples）
+
+分布を標本そのものの疎密だけでなく、各標本に重みを与えた組 $(w_n, x_n)$（$\sum_{n=1}^N w_n = 1$）で表現する手法。
+
+重みつき標本のもとでの統計量は、重みつき平均で計算される：
+
+$$\mathbb{E}[f(x)] \approx \sum_{n=1}^N w_n f(x_n)$$
+
+$$\mathbb{V}[f(x)] \approx \sum_{n=1}^N w_n (f(x_n) - \mathbb{E}[f(x)])^2$$
+
+##### 重点サンプリング（Importance Sampling）
+
+「$p(x)$ の値は評価できるが、直接サンプリングすることが困難」な場合、サンプリングが容易な提案分布 $p_S(x)$ を用いて重みつき標本を得る。
+
+
+[アルゴリズム: 重みつきサンプリング]
+1: 各 n = 1, ..., N について:
+     $x_n \sim p_S(x)$ により標本を取得
+2: 重みを計算: $w_n = p(x_n) / p_S(x_n)$
+3: 重みを正規化: $\sum_{k=1}^N w_k = 1$
+
+
+---
+
+##### 例15：解析的な形で書き表せない事後分布のベイズ推定
+
+例14に対して、パラメータ $\sigma^2$ が未知で、
+事前分布 $p(\sigma^2) = \text{Unif}(0.1, 2)$、
+i.i.d. な標本 $X_N = (x_1, \dots, x_N)$ が与えられた状況を考える。
+
+ベイズの定理より事後分布は以下となる：
+
+$$p(\sigma^2 \vert{} X_N) = \frac{p(\sigma^2)p(X_N\vert{}\sigma^2)}{p(X_N)}$$
+
+* **尤度**: $p(X_N \vert{} \sigma^2) = \prod_{n=1}^N p(x_n \vert{} \sigma^2)$
+* **エビデンス（周辺尤度）**: $p(X_N) = \int \prod_{n=1}^N p(x_n \vert{} \sigma^2) p(\sigma^2) d\sigma^2$
+
+尤度 $p(X_N \vert{} \sigma_m^2)$ が直接計算できる場合、事前分布からサンプリングした標本に尤度の重みを掛けることで事後分布の重みつき標本を得る。
+
+> **[事後分布の重みつき標本獲得アルゴリズム]**
+1: 各 m = 1, ..., M について:
+     $σ_m^2 \sim p(σ^2)$ により事前分布から標本を取得
+2: 重みを尤度で設定: $w_m = p(X_N | σ_m^2)$
+3: 重みを正規化: $\sum_{m=1}^N w_m = 1$
+
+```
+
+隠れ変数 $d$ が含まれ尤度を直接計算できない場合は、隠れ変数も事前分布から多重サンプリング（$N'$ 点）して尤度をモンテカルロ近似する。
+
+> **モンテカルロ法とMCMC**:
+> ベイズ推定の結果を標本や重みつき標本として表現・取得する一連の手法を**モンテカルロ法**と呼ぶ。特に効率的な標本系列を構成する**マルコフ連鎖モンテカルロ法（MCMC法）**は、解析的に解けない事後分布を解く標準的アプローチである。
+
+---
+
+### 例16：カーネル密度推定（KDE）
+
+ノンパラメトリックな密度推定の代表例。$B$ 個の標本 $x_1, \dots, x_B$ を用い、基底関数の重ね合わせとして密度関数を推定する。
+
+$$\tilde{p}(x) = \frac{1}{B} \sum_{b=1}^B h_b(x), \quad h_b(x) = h\left(\frac{x_b - x}{\sigma}\right)$$
+
+* $h(x)$: 原点にピークを持つ**カーネル関数**（$\int h(x)dx = 1$, $h(x) \ge 0$）
+* $\sigma$: 基底の広がりを制御する**バンド幅**
+
+#### 代表的なカーネル関数
+
+1. **ガウス分布カーネル**:
+$$h(x) = \mathcal{N}(x \mid 0, \mathbf{I}_d)$$
+
+
+滑らかで見栄えのよい推定量が得られる。
+2. **エパネクニコフカーネル（Epanechnikov kernel）**:
+$$h(x) = \frac{3}{4}(1 - \|x\|^2) \,\mathbb{I}(\|x\| < 1)$$
+
+
+推定精度の理論的最適性に優れる。
+
+---
+
+### 例17：ニューラルネットワークを用いた分布表現
+
+深層生成モデルでは、単純な潜在変数 $x \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_D)$ をニューラルネットワーク $f(x; \mathbf{w})$ で変換し、高次元データ $y = f(x; \mathbf{w})$（画像や音声）の複雑な分布を表現する。
+
+* CNNと逆畳み込み（Transposed Conv）を組み合わせた構造や、敵対的生成ネットワーク（GAN）などが代表的である。
+
+
