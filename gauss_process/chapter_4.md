@@ -716,16 +716,15 @@ $$p(\sigma^2 \vert{} X_N) = \frac{p(\sigma^2)p(X_N\vert{}\sigma^2)}{p(X_N)}$$
 2: 重みを尤度で設定: $w_m = p(X_N | σ_m^2)$
 3: 重みを正規化: $\sum_{m=1}^N w_m = 1$
 
-```
 
 隠れ変数 $d$ が含まれ尤度を直接計算できない場合は、隠れ変数も事前分布から多重サンプリング（$N'$ 点）して尤度をモンテカルロ近似する。
 
 > **モンテカルロ法とMCMC**:
-> ベイズ推定の結果を標本や重みつき標本として表現・取得する一連の手法を**モンテカルロ法**と呼ぶ。特に効率的な標本系列を構成する**マルコフ連鎖モンテカルロ法（MCMC法）**は、解析的に解けない事後分布を解く標準的アプローチである。
+> ベイズ推定の結果を標本や重みつき標本として表現・取得する一連の手法を**モンテカルロ法**と呼ぶ。特に効率的な標本系列を構成する **マルコフ連鎖モンテカルロ法（MCMC法）** は、解析的に解けない事後分布を解く標準的アプローチである。
 
 ---
 
-### 例16：カーネル密度推定（KDE）
+##### 例16：カーネル密度推定（KDE）
 
 ノンパラメトリックな密度推定の代表例。$B$ 個の標本 $x_1, \dots, x_B$ を用い、基底関数の重ね合わせとして密度関数を推定する。
 
@@ -734,25 +733,145 @@ $$\tilde{p}(x) = \frac{1}{B} \sum_{b=1}^B h_b(x), \quad h_b(x) = h\left(\frac{x_
 * $h(x)$: 原点にピークを持つ**カーネル関数**（$\int h(x)dx = 1$, $h(x) \ge 0$）
 * $\sigma$: 基底の広がりを制御する**バンド幅**
 
-#### 代表的なカーネル関数
+###### 代表的なカーネル関数
 
 1. **ガウス分布カーネル**:
 $$h(x) = \mathcal{N}(x \mid 0, \mathbf{I}_d)$$
-
-
 滑らかで見栄えのよい推定量が得られる。
+<br>
+
 2. **エパネクニコフカーネル（Epanechnikov kernel）**:
 $$h(x) = \frac{3}{4}(1 - \|x\|^2) \,\mathbb{I}(\|x\| < 1)$$
-
-
 推定精度の理論的最適性に優れる。
+
+
+>参考 : KDE
+https://debimate.jp/ml/math/kde/
 
 ---
 
-### 例17：ニューラルネットワークを用いた分布表現
+##### 例17：ニューラルネットワークを用いた分布表現
 
 深層生成モデルでは、単純な潜在変数 $x \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_D)$ をニューラルネットワーク $f(x; \mathbf{w})$ で変換し、高次元データ $y = f(x; \mathbf{w})$（画像や音声）の複雑な分布を表現する。
 
 * CNNと逆畳み込み（Transposed Conv）を組み合わせた構造や、敵対的生成ネットワーク（GAN）などが代表的である。
 
 
+
+---
+
+##### 例15を直感的に理解する
+
+**前提**
+一様分布と正規分布を連鎖させたモデル：
+
+$$\begin{cases} d \sim \text{Unif}(-1, 1) \\ x \sim \mathcal{N}(d, \sigma^2) \end{cases}$$
+> $d$: 範囲$(-1, 1)$から一定の確率で生成される
+> $x$: $d$を中心とした正規分布
+
+・$\sigma^2$ が未知、
+・事前分布 $p(\sigma^2) = \text{Unif}(0.1, 2)$、
+・i.i.d. な標本 $X_N = (x_1, \dots, x_N)$ 
+
+![alt text](img/image-8.png)
+
+
+**全体として何をしたいのか**
+- 手元の観測データ $X_N = (x_1, \dots, x_N)$ から、未知のノイズパラメータ $\sigma^2$ の事後分布 $p(\sigma^2 \mid X_N)$ を近似的に求めることが最終目的。
+- 事後分布を数式（解析的）に直接解くことが難しいため、「重点サンプリング」を使って「値と重みのペア $\{(\sigma_m^2, w_m)\}$」という離散的な標本集合として表現する。
+- これによって、未知だった $\sigma^2$ の平均値や確信区間などをデータから推定できる。
+
+
+**直感的なまとめ**
+- **候補をバラ撒く**: 事前分布 $\text{Unif}(0.1, 2)$ に従って、$\sigma^2$ の候補値 $\sigma_1^2, \dots, \sigma_M^2$ をランダムに選ぶ。
+* **データの適合度を測る**: 各候補値 $\sigma_m^2$ に対して、「観測データ $X_N$ が現れる確率（尤度）」を計算する（$d$ は積分して消去）。
+* **尤度で投票数を決める**: データと矛盾する $\sigma_m^2$ は重み $w_m \approx 0$ となり、データとよく合致する $\sigma_m^2$ は大きな重みを持つ。
+
+これにより、事後分布の解析的な形が複雑であっても、ペア $\{(\sigma_m^2, \tilde{w}_m)\}_{m=1}^M$ を用いて事後平均や事後分散を容易に計算できるようになる。
+
+![alt text](img/image−9.png)
+<!-- 
+###### 1. 尤度 $p(x_n \mid \sigma^2)$ の正体（潜在変数の積分消去）
+
+このモデルのデータ生成プロセスは階層構造になっている。
+各データ点 $x_n$ を観測する裏で、見えない変数（潜在変数） $d_n \sim \text{Unif}(-1, 1)$ が生成されている。
+
+$x_n \sim \mathcal{N}(d_n, \sigma^2)$ であるため、条件付き確率密度は次の通り。
+
+$$p(x_n \mid d_n, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x_n - d_n)^2}{2\sigma^2}\right)$$
+
+しかし、観測データ $X_N$ に $d_n$ は含まれていない。そのため、パラメータ $\sigma^2$ に対する1点あたりの尤度 $p(x_n \mid \sigma^2)$ を求めるには、未知の $d_n$ について積分（周辺化）する必要がある。
+
+$$p(x_n \mid \sigma^2) = \int_{-1}^{1} p(x_n \mid d, \sigma^2) \, p(d) \, dd = \int_{-1}^{1} \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x_n - d)^2}{2\sigma^2}\right) \cdot \frac{1}{2} \, dd$$
+
+この積分は正規分布の累積分布関数 $\Phi(z)$（あるいは誤差関数 $\text{erf}$）を用いて解析的に計算できる。
+
+$$p(x_n \mid \sigma^2) = \frac{1}{2} \left[ \Phi\left(\frac{1 - x_n}{\sigma}\right) - \Phi\left(\frac{-1 - x_n}{\sigma}\right) \right]$$
+
+各データ $x_n$ が独立同分布（i.i.d.）なので、全体の尤度はその積になる。
+
+$$p(X_N \mid \sigma^2) = \prod_{n=1}^N p(x_n \mid \sigma^2)$$
+
+---
+
+## 2. 重みつき標本抽出（重点サンプリング）の仕組み
+
+提示されたアルゴリズムは、ベイズ推論における重点サンプリング（Importance Sampling）の基本形だ。
+
+求めたい事後分布 $p(\sigma^2 \mid X_N)$ から直接サンプルを引くのは難しいが、事前分布 $p(\sigma^2) = \text{Unif}(0.1, 2)$ からなら一様乱数として簡単に生成できる。
+
+### 重み付けが機能する理由
+
+事後分布の期待値 $\mathbb{E}_{p(\sigma^2 \mid X_N)}[f(\sigma^2)]$ を計算したい場合を考える。
+
+$$\mathbb{E}_{p(\sigma^2 \mid X_N)}[f(\sigma^2)] = \int f(\sigma^2) \, p(\sigma^2 \mid X_N) \, d\sigma^2 = \int f(\sigma^2) \, \frac{p(X_N \mid \sigma^2) \, p(\sigma^2)}{p(X_N)} \, d\sigma^2$$
+
+ここで、事前分布 $p(\sigma^2)$ に関する期待値の形に変形する。
+
+$$= \frac{1}{p(X_N)} \int f(\sigma^2) \, p(X_N \mid \sigma^2) \, p(\sigma^2) \, d\sigma^2 = \frac{\mathbb{E}_{p(\sigma^2)}[f(\sigma^2) \, p(X_N \mid \sigma^2)]}{\mathbb{E}_{p(\sigma^2)}[p(X_N \mid \sigma^2)]}$$
+
+事前分布から引いた $M$ 個のサンプル $\sigma_m^2 \sim p(\sigma^2)$ を用いてモンテカルロ近似すると、次式が得られる。
+
+$$\approx \frac{\frac{1}{M}\sum_{m=1}^M f(\sigma_m^2) \, p(X_N \mid \sigma_m^2)}{\frac{1}{M}\sum_{m=1}^M p(X_N \mid \sigma_m^2)} = \sum_{m=1}^M \tilde{w}_m f(\sigma_m^2)$$
+
+各サンプルの重みは次のように決まる。
+
+* **非正規化重み**: $w_m = p(X_N \mid \sigma_m^2)$ （尤度）
+* **正規化重み**: $\tilde{w}_m = \frac{w_m}{\sum_{k=1}^M w_k}$
+
+> **注記**: 元のアルゴリズム記載にある「3: 重みを正規化: $\sum_{m=1}^N w_m = 1$」は、インデックスの上限が正しくはサンプル総数 $M$（$\sum_{m=1}^M \tilde{w}_m = 1$）となる。
+
+---
+
+## 3. 直感的なまとめ
+
+* **候補をバラ撒く**: 事前分布 $\text{Unif}(0.1, 2)$ に従って、$\sigma^2$ の候補値 $\sigma_1^2, \dots, \sigma_M^2$ をランダムに選ぶ。
+* **データの適合度を測る**: 各候補値 $\sigma_m^2$ に対して、「観測データ $X_N$ が現れる確率（尤度）」を計算する（$d$ は積分して消去）。
+* **尤度で投票数を決める**: データと矛盾する $\sigma_m^2$ は重み $w_m \approx 0$ となり、データとよく合致する $\sigma_m^2$ は大きな重みを持つ。
+
+これにより、事後分布の解析的な形が複雑であっても、ペア $\{(\sigma_m^2, \tilde{w}_m)\}_{m=1}^M$ を用いて事後平均や事後分散を容易に計算できるようになる。
+
+
+
+
+
+
+###### 尤度 $p(x_n \mid \sigma^2)$ の正体（潜在変数の積分消去）
+- このモデルのデータ生成プロセスは階層構造
+- 各データ点 $x_n$ を観測する裏で、見えない変数（潜在変数） $d_n \sim \text{Unif}(-1, 1)$ が生成されている。$x_n \sim \mathcal{N}(d_n, \sigma^2)$ であるため、条件付き確率密度は $p(x_n \mid d_n, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x_n - d_n)^2}{2\sigma^2}\right)$。しかし、観測データ $X_N$ に $d_n$ は含まれていません。そのため、パラメータ $\sigma^2$ に対する1点あたりの尤度 $p(x_n \mid \sigma^2)$ を求めるには、未知の $d_n$ について積分（周辺化）する必要があります。$$p(x_n \mid \sigma^2) = \int_{-1}^{1} p(x_n \mid d, \sigma^2) \, p(d) \, dd = \int_{-1}^{1} \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x_n - d)^2}{2\sigma^2}\right) \cdot \frac{1}{2} \, dd$$この積分は正規分布の累積分布関数 $\Phi(z)$（あるいは誤差関数 $\text{erf}$）を用いて解析的に計算できます。$$p(x_n \mid \sigma^2) = \frac{1}{2} \left[ \Phi\left(\frac{1 - x_n}{\sigma}\right) - \Phi\left(\frac{-1 - x_n}{\sigma}\right) \right]$$各データ $x_n$ が独立同分布（i.i.d.）なので、全体の尤度はその積になります。$$p(X_N \mid \sigma^2) = \prod_{n=1}^N p(x_n \mid \sigma^2)$$2. 重みつき標本抽出（重点サンプリング）の仕組み提示されたアルゴリズムは、ベイズ推論における重点サンプリング（Importance Sampling）の基本形です。求めたい事後分布 $p(\sigma^2 \mid X_N)$ から直接サンプルを引くのは難しいですが、事前分布 $p(\sigma^2) = \text{Unif}(0.1, 2)$ からなら一様乱数として簡単に生成できます。重み付けが機能する理由事後分布の期待値 $\mathbb{E}_{p(\sigma^2 \mid X_N)}[f(\sigma^2)]$ を計算したい場合を考えます。$$\mathbb{E}_{p(\sigma^2 \mid X_N)}[f(\sigma^2)] = \int f(\sigma^2) \, p(\sigma^2 \mid X_N) \, d\sigma^2 = \int f(\sigma^2) \, \frac{p(X_N \mid \sigma^2) \, p(\sigma^2)}{p(X_N)} \, d\sigma^2$$ここで、事前分布 $p(\sigma^2)$ に関する期待値の形に変形します。$$= \frac{1}{p(X_N)} \int f(\sigma^2) \, p(X_N \mid \sigma^2) \, p(\sigma^2) \, d\sigma^2 = \frac{\mathbb{E}_{p(\sigma^2)}[f(\sigma^2) \, p(X_N \mid \sigma^2)]}{\mathbb{E}_{p(\sigma^2)}[p(X_N \mid \sigma^2)]}$$事前分布から引いた $M$ 個のサンプル $\sigma_m^2 \sim p(\sigma^2)$ を用いてモンテカルロ近似すると、$$\approx \frac{\frac{1}{M}\sum_{m=1}^M f(\sigma_m^2) \, p(X_N \mid \sigma_m^2)}{\frac{1}{M}\sum_{m=1}^M p(X_N \mid \sigma_m^2)} = \sum_{m=1}^M \tilde{w}_m f(\sigma_m^2)$$ここで、各サンプルの重みは次のように決まります。非正規化重み: $w_m = p(X_N \mid \sigma_m^2)$ （尤度）正規化重み: $\tilde{w}_m = \frac{w_m}{\sum_{k=1}^M w_k}$※元のアルゴリズム記載で「3: 重みを正規化: $\sum_{m=1}^N w_m = 1$」とあるのは、インデックスの上限が正しくはサンプル総数 $M$（$\sum_{m=1}^M \tilde{w}_m = 1$）となります。直感的なまとめ候補をバラ撒く：事前分布 $\text{Unif}(0.1, 2)$ に従って、$\sigma^2$ の候補値 $\sigma_1^2, \dots, \sigma_M^2$ をランダムに選ぶ。データの適合度を測る：各候補値 $\sigma_m^2$ に対して、「観測データ $X_N$ が現れる確率（尤度）」を計算する（$d$ は積分して消去）。尤度で投票数を決める：データと矛盾する $\sigma_m^2$ は重み $w_m \approx 0$ となり、データとよく合致する $\sigma_m^2$ は大きな重みを持つ。これにより、事後分布の解析的な形が複雑であっても、ペア $\{(\sigma_m^2, \tilde{w}_m)\}_{m=1}^M$ を用いて事後平均や事後分散を容易に計算できるようになります。
+
+
+ベイズの定理より事後分布は以下となる：
+
+$$p(\sigma^2 \vert{} X_N) = \frac{p(\sigma^2)p(X_N\vert{}\sigma^2)}{p(X_N)}$$
+
+* **尤度**: $p(X_N \vert{} \sigma^2) = \prod_{n=1}^N p(x_n \vert{} \sigma^2)$
+* **エビデンス（周辺尤度）**: $p(X_N) = \int \prod_{n=1}^N p(x_n \vert{} \sigma^2) p(\sigma^2) d\sigma^2$
+
+尤度 $p(X_N \vert{} \sigma_m^2)$ が直接計算できる場合、事前分布からサンプリングした標本に尤度の重みを掛けることで事後分布の重みつき標本を得る。
+
+> **[事後分布の重みつき標本獲得アルゴリズム]**
+1: 各 m = 1, ..., M について:
+     $σ_m^2 \sim p(σ^2)$ により事前分布から標本を取得
+2: 重みを尤度で設定: $w_m = p(X_N | σ_m^2)$
+3: 重みを正規化: $\sum_{m=1}^N w_m = 1$ -->
